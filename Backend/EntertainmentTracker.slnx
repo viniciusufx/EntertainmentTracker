@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="EntertainmentTracker.Api/EntertainmentTracker.Api.csproj" />
+  <Project Path="EntertainmentTracker.Application/EntertainmentTracker.Application.csproj" />
+  <Project Path="EntertainmentTracker.Domain/EntertainmentTracker.Domain.csproj" />
+  <Project Path="EntertainmentTracker.Infrastructure/EntertainmentTracker.Infrastructure.csproj" />
+</Solution>

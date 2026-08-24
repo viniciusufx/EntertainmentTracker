@@ -1,0 +1,72 @@
+services:
+  postgres:
+    # Imagem oficial do PostgreSQL baseada em Alpine Linux
+    # Menor tamanho e inicialização mais rápida.
+    image: docker.io/library/postgres:18-alpine
+
+    # Nome fixo do container.
+    container_name: postgres
+
+    # Reinicia automaticamente, exceto quando parado manualmente.
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    environment:
+      # Usuário administrador criado na inicialização.
+      POSTGRES_USER: ${POSTGRES_USER}
+
+      # Senha do usuário administrador.
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+      # Banco de dados criado automaticamente.
+      POSTGRES_DB: ${POSTGRES_DB}
+
+    ports:
+      # Expõe a porta do PostgreSQL para o host.
+      # HOST:CONTAINER
+      - "5432:5432"
+
+    volumes:
+      # Volume persistente para que os dados sobrevivam
+      # mesmo após remover o container.
+      - postgres_data:/var/lib/postgresql
+
+    healthcheck:
+      # Verifica se o banco está pronto para receber conexões.
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ${POSTGRES_DB}"]
+
+      # Intervalo entre verificações.
+      interval: 10s
+
+      # Tempo máximo para cada tentativa.
+      timeout: 5s
+
+      # Quantidade de falhas antes de marcar como unhealthy.
+      retries: 5
+
+    # Memória compartilhada utilizada pelo PostgreSQL.
+    # Evita problemas com operações grandes de ordenação,
+    # índices e consultas paralelas.
+    shm_size: 512mb
+
+    command: >
+      -c shared_buffers=512MB
+      -c effective_cache_size=2GB
+      -c maintenance_work_mem=256MB
+      -c work_mem=16MB
+      -c max_connections=100
+      -c wal_buffers=16MB
+      -c min_wal_size=1GB
+      -c max_wal_size=4GB
+      -c checkpoint_completion_target=0.9
+      -c random_page_cost=1.1
+      -c effective_io_concurrency=200
+      -c synchronous_commit=off
+      -c wal_compression=on
+      -c shared_preload_libraries=pg_stat_statements
+
+volumes:
+  # Volume nomeado utilizado para persistência dos dados.
+  postgres_data:
